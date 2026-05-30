@@ -20,22 +20,25 @@ class CheckQuota
      */
     public function handle(Request $request, Closure $next, string $metricCode, $amount = 1)
     {
+        $metricName = $metricCode;
+        $metric = \Keloola\Quota\Models\QuotaMetric::where('code', $metricCode)->first();
+        if ($metric) {
+            $metricName = $metric->name;
+        }
+
         try {
             if (!Quota::canConsume($metricCode, (int) $amount)) {
                 return response()->json([
-                    'message' => 'Quota limit exceeded.',
-                    'error' => __('keloola-quota::messages.exceeded_limit', ['metric' => $metricCode])
+                    'message' => __('keloola-quota::messages.exceeded_limit', ['metric' => $metricName]),
                 ], 429); // 429 Too Many Requests
             }
         } catch (QuotaMetricNotFoundException $e) {
             return response()->json([
-                'message' => 'Metric not found.',
-                'error' => __('keloola-quota::messages.metric_not_found', ['metric' => $metricCode])
+                'message' => __('keloola-quota::messages.metric_not_found', ['metric' => $metricName]),
             ], 400);
         } catch (\LogicException $e) {
             return response()->json([
-                'message' => 'Quota context missing.',
-                'error' => __('keloola-quota::messages.context_missing')
+                'message' => __('keloola-quota::messages.context_missing'),
             ], 403);
         }
 
