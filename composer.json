@@ -6,7 +6,9 @@
     "keywords": ["laravel", "quota", "billing", "subscription", "saas", "limits"],
     "authors": [
         {
-            "name": "Keloola"
+            "name": "Roni Jakarianto",
+            "email": "roni.jakarianto@thrive.co.id",
+            "role": "Developer"
         }
     ],
     "require": {
