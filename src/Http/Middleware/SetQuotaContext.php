@@ -15,14 +15,16 @@ class SetQuotaContext
 
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->bearerToken();
 
-        if (!$token) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $token = $request->cookie('token');
+        if($request->bearerToken()) {
+            $token = $request->bearerToken();
         }
 
-        $data = $request?->sso_user ?? $this->ssoClient->getUserProfile($token);
+        if(!$token)  return response()->json(['message' => 'Unauthorized'], 401);
+        
 
+        $data = $request?->sso_user ?? $this->ssoClient->getUserProfile($token);
         if (!$data || !isset($data['applications']) || !is_array($data['applications'])) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
